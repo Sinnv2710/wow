@@ -1,0 +1,114 @@
+name: Automation testing with CodeceptJS and Playwright
+on:
+  workflow_dispatch:
+    inputs:
+        tags: 
+          description: 'Tag feature'
+          
+jobs:
+  e2e-automation-testing:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.19.0]
+    steps:
+    - uses: actions/checkout@v2.1.0
+    
+    - name: Step 1 - Setting up Node.js and Yarn
+      uses: borales/actions-yarn@v2.3.0
+      with:
+        cmd: install # will run `yarn install` command
+        yarn-version: "latest"
+    
+    - name: Step 2 - Installing dependencies and run tests
+      run: | 
+        yarn install && npx playwright install
+
+    - name: Step 3 - Run tests  
+      run: |
+        yarn test:ci
+      continue-on-error: true  
+
+    - name: Step 4 - Collecting report folder and generate allure-report folder
+      run: |
+        mkdir ./allure-results
+        cp -r ./reports/* ./allure-results
+
+    - name: Step 5 - Uploading Allure artifact to Github action
+      uses: actions/upload-artifact@v2
+      with:
+        name: allure-results
+        path: allure-results
+        retention-days: 20
+
+    - name: Step 6 - Checkout gh-pages branch to prepare report
+      uses: actions/checkout@v2
+      if: always()
+      continue-on-error: true
+      with:
+        ref: gh-pages
+        path: gh-pages
+
+    - name: Step 7 - Generating Allure report
+      uses: simple-elf/allure-report-action@master
+      if: always()
+      id: allure-report
+      with:
+        allure_results: allure-results
+        gh_pages: gh-pages
+        allure_report: allure-report
+        allure_history: allure-history
+        keep_reports: 20
+      
+    - name: Step 8 - Deploying report to Github Pages
+      if: always()
+      uses: peaceiris/actions-gh-pages@v2
+      env:
+        PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: allure-history
+
+    - name: Step 9 - URL report 
+      if: always()
+      run: |
+        echo "Link to report => https://ofnoah.github.io/automationCodeceptjs/${{ github.run_number }}/"
+
+    - name: Step 10 - Send notification for Slack via QA BOT if runner is success
+      if: success()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: automation-repo
+        SLACK_USERNAME: QaBot
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_ICON: https://i.imgur.com/LMJt2Gw.png
+        SLACK_TITLE: 'The Report is ready :white_check_mark: '
+        SLACK_MESSAGE: 'https://ofnoah.github.io/automationCodeceptjs/${{ github.run_number }} :rocket:'
+        SLACK_FOOTER	: Please review the report and make sure it is correct.
+        MSG_MINIMAL: true
+        SLACK_MSG_AUTHOR: ${{ github.actor }}
+
+    - name: Step 11 - Send notification for Slack via QA BOT if runner is success
+      if: failure()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_CHANNEL: automation-repo
+        SLACK_USERNAME: QaBot
+        SLACK_COLOR: ${{ job.status }}
+        SLACK_ICON: https://i.imgur.com/LMJt2Gw.png
+        SLACK_TITLE: Workflow failed. Please check the logs. 
+        SLACK_FOOTER	: Please check workflow logs and make sure it is correct.
+        SLACK_MESSAGE: ':no_entry: :no_entry: :no_entry: :no_entry:'
+        MSG_MINIMAL: actions url
+        SLACK_MSG_AUTHOR: ${{ github.actor }}    
+
+         
+          
+
+                             
+
+    
+
+     
+

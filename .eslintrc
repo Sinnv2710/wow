@@ -1,0 +1,68 @@
+{
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
+    "parser": "babel-eslint",
+    "env": {
+        "es6": true
+    },
+    "plugins": ["prettier"],
+    "extends": ["prettier"],
+    "rules": {
+        "require-await": "warn",
+        "prettier/prettier": ["warn"],
+        "no-console": 0,
+        "no-var": 2,
+        "eqeqeq": ["warn"],
+        "global-require": "off",
+        //        "no-unused-vars": [
+        //            "warn",
+        //            { "vars": "all", "args": "none", "ignoreRestSiblings": true }
+        //        ],
+        "comma-spacing": ["warn", { "before": false, "after": true }],
+        "prefer-const": ["warn", { "destructuring": "all" }],
+        "camelcase": ["warn", { "properties": "never" }],
+        "no-tabs": "warn",
+        "no-duplicate-case": "warn",
+        "no-const-assign": "warn",
+        "no-trailing-spaces": "warn",
+        "no-mixed-spaces-and-tabs": "warn",
+        "no-multi-spaces": "warn",
+        "no-irregular-whitespace": "warn",
+        "indent": [
+            "warn",
+            4,
+            {
+                "SwitchCase": 1,
+                "VariableDeclarator": 1,
+                "outerIIFEBody": 1,
+                "MemberExpression": 1,
+                "FunctionDeclaration": { "parameters": 1, "body": 1 },
+                "FunctionExpression": { "parameters": 1, "body": 1 },
+                "CallExpression": { "arguments": 1 },
+                "ArrayExpression": 1,
+                "ObjectExpression": 1,
+                "ImportDeclaration": 1,
+                "flatTernaryExpressions": false,
+                "ignoreComments": false,
+                "ignoredNodes": ["TemplateLiteral *"]
+            }
+        ],
+        "space-in-parens": ["warn", "never"],
+        "quotes": [2, "single", "avoid-escape"],
+        "semi": [2, "never"],
+        "eol-last": "warn",
+        "require-jsdoc": [
+            "warn",
+            {
+                "require": {
+                    "FunctionDeclaration": false,
+                    "MethodDefinition": false,
+                    "ClassDeclaration": false,
+                    "ArrowFunctionExpression": false,
+                    "FunctionExpression": false
+                }
+            }
+        ]
+    }
+}
